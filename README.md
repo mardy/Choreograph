@@ -5,6 +5,8 @@ v0.4.0
 
 Choreograph is designed to describe motion. With it, you compose motion Phrases into Sequences that can be used to animate arbitrary properties on a Timeline.
 
+This is a maintained fork, after [the original project](https://github.com/sansumbrella/Choreograph) stopped being maintained.
+
 ## Basic Usage
 
 Simple things are simple. You can animate a variable through a sequence of values in Choreograph by creating a sequence of ramps.
