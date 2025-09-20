@@ -5,6 +5,8 @@
 //
 //
 
+#define CATCH_CONFIG_MAIN
+
 #include "catch.hpp"
 #include "choreograph/Choreograph.h"
 

@@ -4,17 +4,50 @@
 
 #include "choreograph/Choreograph.h"
 
+#if TEST_WITH_CINDER
 #include "cinder/Vector.h"
 #include "cinder/Timeline.h"
 #include "cinder/Timer.h"
+using cinder::Timeline;
+#endif
+
 
 #include <chrono>
 
 using namespace std;
-using cinder::Timeline;
-using cinder::vec2;
-using cinder::Timer;
 using namespace choreograph;
+
+class Timer: public Catch::Timer
+{
+public:
+    Timer(bool start_on_creation = false):
+        Catch::Timer()
+    {
+        if (start_on_creation)
+            start();
+    }
+
+    void stop() {}
+    double getSeconds() const { return getElapsedSeconds(); }
+};
+
+struct vec2
+{
+    vec2(double x = 0.0f, double y = 0.0f): x(x), y(y) {}
+
+    vec2 operator+(const vec2 &o) const {
+        return { x + o.x, y + o.y };
+    }
+    vec2 operator-(const vec2 &o) const {
+        return { x - o.x, y - o.y };
+    }
+    vec2 operator*(double s) const {
+        return { x * s, y *s };
+    }
+
+private:
+    double x, y;
+};
 
 void printTiming( const std::string &text, double milliseconds, const std::string &suffix = "ms" )
 {
@@ -41,7 +74,7 @@ TEST_CASE( "Sequence Manipulation Timing" )
 {
   printHeading( "Sequence Creation and Slicing" );
 
-  Timer create_medium( true );
+  Timer create_medium;
   Sequence<float> medium_sequence( 0.0f );
   medium_sequence.then<RampTo>( 10.0f, 1.0f, EaseInOutQuad() )
     .then<RampTo>( 1.0f, 1.0f, EaseInOutQuad() )
@@ -161,20 +194,23 @@ TEST_CASE( "Choreograph Timeline Basic Performance" )
 TEST_CASE( "Comparative Performance with cinder::Timeline" )
 {
   ch::Timeline    choreograph_timeline;
-  ci::TimelineRef cinder_timeline = ci::Timeline::create();
 
   const int               tween_count = 5000;
   vector<Output<vec2>>    targets;
   while ( targets.size() < tween_count ) {
     targets.emplace_back( vec2( 0 ) );
   }
-  vector<ci::Anim<vec2>>  cinder_targets( tween_count, vec2( 0 ) );
 
-  double ci_step_avg    = 0;
   double ch_step_avg    = 0;
-  double ci_create_avg  = 0;
   double ch_create_avg  = 0;
   double iterations     = 4;
+
+#if TEST_WITH_CINDER
+  ci::TimelineRef cinder_timeline = ci::Timeline::create();
+  vector<ci::Anim<vec2>>  cinder_targets( tween_count, vec2( 0 ) );
+  double ci_step_avg    = 0;
+  double ci_create_avg  = 0;
+#endif
 
   SECTION( "Tween many targets" )
   {
@@ -193,6 +229,7 @@ TEST_CASE( "Comparative Performance with cinder::Timeline" )
       }
       ch_create.stop();
 
+#if TEST_WITH_CINDER
       // Create Cinder Tweens
       Timer ci_create( true );
       for( int i = 0; i < tween_count; ++i ) {
@@ -200,6 +237,7 @@ TEST_CASE( "Comparative Performance with cinder::Timeline" )
           .delay( 1.0f );
       }
       ci_create.stop();
+#endif
 
       Timer ch_step( true );
       // Step through Choreograph Motions
@@ -208,6 +246,7 @@ TEST_CASE( "Comparative Performance with cinder::Timeline" )
       }
       ch_step.stop();
 
+#if TEST_WITH_CINDER
       Timer ci_step( true );
       // Step through Cinder Tweens
       for( float t = 0.0f; t <= total_time; t += dt ) {
@@ -217,22 +256,27 @@ TEST_CASE( "Comparative Performance with cinder::Timeline" )
 
       ci_create_avg += ci_create.getSeconds() * 1000;
       ci_step_avg += ci_step.getSeconds() * 1000;
+#endif
 
       ch_create_avg += ch_create.getSeconds() * 1000;
       ch_step_avg += ch_step.getSeconds() * 1000;
     }
 
+#if TEST_WITH_CINDER
     ci_create_avg /= iterations;
     ci_step_avg /= iterations;
+#endif
     ch_create_avg /= iterations;
     ch_step_avg /= iterations;
 
     printTiming( "Choreograph Create Average", ch_create_avg );
-    printTiming( "Cinder Create Average", ci_create_avg );
     printTiming( "Choreograph Step Average", ch_step_avg );
+#if TEST_WITH_CINDER
+    printTiming( "Cinder Create Average", ci_create_avg );
     printTiming( "Cinder Step Average", ci_step_avg );
     printTiming( "Create Performance (Choreograph / Cinder)", (ch_create_avg / ci_create_avg), "" );
     printTiming( "Step Performance (Choreograph / Cinder)", (ch_step_avg / ci_step_avg), "" );
+#endif
   }
 
   SECTION( "Tween one target many times" )
@@ -244,7 +288,6 @@ TEST_CASE( "Comparative Performance with cinder::Timeline" )
     for( int j = 0; j < iterations; j += 1 )
     {
       Output<vec2>    target( vec2( 0 ) );
-      ci::Anim<vec2>  cinder_target( vec2( 0 ) );
 
       // Create Choreograph Motions
       Timer ch_create( true );
@@ -253,12 +296,15 @@ TEST_CASE( "Comparative Performance with cinder::Timeline" )
       }
       ch_create.stop();
 
+#if TEST_WITH_CINDER
+      ci::Anim<vec2>  cinder_target( vec2( 0 ) );
       // Create Cinder Tweens
       Timer ci_create( true );
       for( int i = 0; i < tween_count; ++i ) {
         cinder_timeline->appendTo( &cinder_target, vec2( i * 5, i * 20 ), 2.0f ).delay( 1.0f );
       }
       ci_create.stop();
+#endif
 
       // Step through Choreograph Motions
       Timer ch_step( true );
@@ -267,6 +313,7 @@ TEST_CASE( "Comparative Performance with cinder::Timeline" )
       }
       ch_step.stop();
 
+#if TEST_WITH_CINDER
       // Step through Cinder Tweens
       Timer ci_step( true );
       for( float t = 0.0f; t <= total_time; t += dt ) {
@@ -276,21 +323,26 @@ TEST_CASE( "Comparative Performance with cinder::Timeline" )
 
       ci_create_avg += ci_create.getSeconds() * 1000;
       ci_step_avg += ci_step.getSeconds() * 1000;
+#endif
 
       ch_create_avg += ch_create.getSeconds() * 1000;
       ch_step_avg += ch_step.getSeconds() * 1000;
     }
 
+#if TEST_WITH_CINDER
     ci_create_avg /= iterations;
     ci_step_avg /= iterations;
+#endif
     ch_create_avg /= iterations;
     ch_step_avg /= iterations;
 
     printTiming( "Choreograph Create Average", ch_create_avg );
-    printTiming( "Cinder Create Average", ci_create_avg );
     printTiming( "Choreograph Step Average", ch_step_avg );
+#if TEST_WITH_CINDER
     printTiming( "Cinder Step Average", ci_step_avg );
+    printTiming( "Cinder Create Average", ci_create_avg );
     printTiming( "Create Performance (Choreograph / Cinder)", (ch_create_avg / ci_create_avg), "" );
     printTiming( "Step Performance (Choreograph / Cinder)", (ch_step_avg / ci_step_avg), "" );
+#endif
   }
 }
