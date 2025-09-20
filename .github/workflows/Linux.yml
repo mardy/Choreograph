@@ -1,0 +1,17 @@
+name: Gamecube CI
+
+on: [push, pull_request]
+
+jobs:
+  Linux:
+    name: ubuntu-latest
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build
+      run: |
+        meson setup build .
+        meson test
+
