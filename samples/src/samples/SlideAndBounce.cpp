@@ -28,7 +28,6 @@
 #include "SlideAndBounce.h"
 
 using namespace choreograph;
-using namespace cinder;
 using namespace std;
 
 void SlideAndBounce::setup()
@@ -41,14 +40,15 @@ void SlideAndBounce::setup()
   } );
 
   // Create a ramp phrase from the left to the right side of the window.
-  float w = (float)app::getWindowWidth();
+  //float w = (float)ImGui::GetIO().DisplaySize.x;
+  float w = (float)getSize().x;
   float x1 = w * 0.08f;
   float x2 = w - x1;
   PhraseRef<vec2> slide = makeRamp( vec2( x1, 0 ), vec2( x2, 0 ), 2.0f, EaseInOutCubic() );
 
   // Combine the slide and bounce phrases using an AccumulatePhrase.
   // By default, the accumulation operation sums all the phrase values with an initial value.
-  float center_y = app::getWindowHeight() / 2.0f;
+  float center_y = getSize().y / 2.0f;
   PhraseRef<vec2> bounce_and_slide = makeAccumulator( vec2( 0, center_y ), bounce, slide );
 
   // Provide an explicit combine function.
@@ -74,16 +74,15 @@ void SlideAndBounce::update( Time dt )
 
 void SlideAndBounce::draw()
 {
-  gl::ScopedColor color( Color( CM_HSV, 0.72f, 1.0f, 1.0f ) );
-  gl::drawSolidCircle( _position_a, 30.0f );
+  ImDrawList *list = ImGui::GetWindowDrawList();
+  list->AddCircleFilled( vec2(_position_a), 30.0f, Color::HSV( 0.72f, 1.0f, 1.0f ) );
 
-  gl::color( Color( CM_HSV, 0.96f, 1.0f, 1.0f ) );
-  gl::drawSolidCircle( _position_b, 30.0f );
+  list->AddCircleFilled( vec2(_position_b), 30.0f, Color::HSV( 0.96f, 1.0f, 1.0f ) );
 
   // References are translated for visibility.
-  float y = app::getWindowHeight() * 0.2f;
-  gl::color( Color( CM_HSV, 0.15f, 1.0f, 1.0f ) );
+  float y = ImGui::GetWindowHeight() * 0.2f;
+  auto color = Color::HSV( 0.15f, 1.0f, 1.0f );
 
-  gl::drawStrokedCircle( _reference_bounce() + vec2( app::getWindowWidth() * 0.08f, y ), 4.0f );
-  gl::drawStrokedCircle( _reference_slide() + vec2( 0, y ), 4.0f );
+  list->AddCircle( _reference_bounce() + vec2( ImGui::GetWindowWidth() * 0.08f, y ), 4.0f, color );
+  list->AddCircle( _reference_slide() + vec2( 0, y ), 4.0f, color );
 }

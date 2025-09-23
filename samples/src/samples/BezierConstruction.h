@@ -39,15 +39,15 @@ public:
   void draw() override;
 private:
   struct Point {
-    ch::Output<ci::vec2>  _position;
-    ci::Color             _color;
+    ch::Output<vec2>  _position;
+    Color             _color;
   };
 
-  std::vector<ci::vec2> _segments;
+  std::vector<vec2> _segments;
 
-  std::array<ci::vec2, 4> _curve_points;
+  std::array<vec2, 4> _curve_points;
 
-  ch::Output<ci::vec2>  _control_a;
-  ch::Output<ci::vec2>  _control_b;
-  ch::Output<ci::vec2>  _curve_point;
+  ch::Output<vec2>  _control_a;
+  ch::Output<vec2>  _control_b;
+  ch::Output<vec2>  _curve_point;
 };
