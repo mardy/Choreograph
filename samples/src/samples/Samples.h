@@ -41,8 +41,10 @@ const std::vector<std::pair<std::string, SampleFn>> SampleList =
   { "Slide", std::make_shared<SlideAndBounce> },
   { "Bezier", std::make_shared<BezierConstruction> },
   { "Repetition", std::make_shared<Repetition> },
+#if 0
   { "Worm Bunch", std::make_shared<WormBuncher> },
   { "Dev Junk", std::make_shared<Quaternions> }
+#endif
 };
 
 const std::vector<std::string> SampleNames = ([]

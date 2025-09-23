@@ -42,7 +42,7 @@ public:
 private:
   struct Point {
 #if defined(CINDER_MSW)
-    Point( ch::Output<ci::vec2> &&position, const ci::Color &color, const std::string &description ):
+    Point( ch::Output<vec2> &&position, const ImU32 &color, const std::string &description ):
       _position( std::move( position ) ),
       _color( color ),
       _description( description )
@@ -55,14 +55,14 @@ private:
     {}
     Point( const Point &rhs ) = delete;
 #endif
-    ch::Output<ci::vec2>  _position;
-    ci::Color             _color;
+    ch::Output<vec2>      _position;
+    Color                 _color;
     std::string           _description;
   };
 
   std::vector<Point> mTargets;
 
   // For grouped motion, we'll use these two properties.
-  ch::Output<ci::vec2>  _position;
-  ch::Output<ci::vec3>  _rotation;
+  ch::Output<vec2>  _position;
+  ch::Output<vec3>  _rotation;
 };

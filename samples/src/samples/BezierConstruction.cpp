@@ -27,13 +27,13 @@
 
 #include "BezierConstruction.h"
 
+#include <iostream>
 using namespace choreograph;
-using namespace cinder;
 
 void BezierConstruction::setup()
 {
-  float w = (float)app::getWindowWidth();
-  float h = (float)app::getWindowHeight();
+  float w = getSize().x;
+  float h = getSize().y;
   _curve_points = {
     vec2( w * 0.08f, h * 0.86f ),
     vec2( w * 0.08f, h * 0.14f ),
@@ -98,42 +98,37 @@ void BezierConstruction::update( Time dt )
 
 void BezierConstruction::draw()
 {
-  gl::ScopedColor       color( Color::white() );
-  gl::ScopedBlendAlpha  blend;
   Color curve_color( 1.0f, 1.0f, 0.0f );
   Color control_color( 1.0f, 0.0f, 1.0f );
   Color line_color( 0.0f, 1.0f, 1.0f );
   Color future_color( 1.0f, 1.0f, 1.0f );
 
+  ImDrawList *list = ImGui::GetWindowDrawList();
+
   // Draw our curve.
-  gl::color( line_color );
-  gl::begin( GL_LINE_STRIP );
   for( auto &segment : _segments ) {
-    gl::vertex( segment );
+    list->PathLineTo( segment );
   }
-  gl::end();
+  list->PathStroke(line_color);
 
   // Draw our curve's static control points.
   for( auto &point : _curve_points ) {
-    gl::drawSolidCircle( point, 6.0f );
+    list->AddCircleFilled( point, 6.0f, line_color );
   }
 
   // Draw the paths traveled by our animating control points.
-  gl::drawLine( _curve_points[0], _curve_points[1] );
-  gl::drawLine( _curve_points[2], _curve_points[3] );
+  list->AddLine( _curve_points[0], _curve_points[1], line_color );
+  list->AddLine( _curve_points[2], _curve_points[3], line_color );
 
   // Draw our animating control points.
-  gl::color( control_color );
-  gl::drawStrokedCircle( _control_a, 10.0f );
-  gl::drawStrokedCircle( _control_b, 10.0f );
+  list->AddCircleFilled( vec2(_control_a), 10.0f, control_color );
+  list->AddCircleFilled( vec2(_control_b), 10.0f, control_color );
 
   // Draw our curve point's tangent line.
-  gl::color( future_color );
-  gl::drawLine( _curve_point, _control_b );
-  gl::color( curve_color );
-  gl::drawLine( _control_a, _curve_point );
+  list->AddLine( vec2(_curve_point), vec2(_control_b), future_color );
+  list->AddLine( vec2(_control_a), vec2(_curve_point), curve_color );
   // And our leading curve point.
-  gl::drawStrokedCircle( _curve_point, 12.0f );
+  list->AddCircle( vec2(_curve_point), 12.0f, curve_color );
 
-  gl::drawString( "Bezier Path", _curve_point() - vec2( 0, 16 ) );
+  list->AddText( _curve_point() - vec2( 0, 16 ), curve_color, "Bezier Path" );
 }

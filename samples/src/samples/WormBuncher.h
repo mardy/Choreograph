@@ -47,10 +47,10 @@ struct WormSegment
   WormSegment( const WormSegment &rhs ) = delete;
 #endif
 
-  ci::Color             color;
+  ImU32             color;
   ch::Output<float>     alpha = 0.0f;
-  ch::Output<ci::vec3>  position;
-  ch::Output<ci::quat>  orientation;
+  ch::Output<vec3>  position;
+  ch::Output<quat>  orientation;
 };
 
 class WormBuncher : public pk::Scene
@@ -60,8 +60,6 @@ public:
   void setup() override;
 
   void update( ch::Time dt ) override;
-
-  void connect( ci::app::WindowRef window ) override;
 
   void draw() override;
 

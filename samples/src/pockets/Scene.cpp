@@ -28,50 +28,36 @@
 #include "Scene.h"
 
 using namespace pockets;
-using namespace cinder;
 
 Scene::Scene()
 { // start updating
-  mUpdateConnection.store( app::App::get()->getSignalUpdate().connect( [this]()
-  {
-    update( _timer.getSeconds() * _animation_speed() );
-    _timer.start();
-  } ) );
-
-  _timer.start();
 }
 
 Scene::~Scene()
-{ // make sure nothing references us anymore
-  mUpdateConnection.disconnect();
-  disconnect();
-  removeFromDisplay();
+{
 }
 
-void Scene::baseDraw()
+void Scene::baseDraw(double elapsed)
 {
-  gl::ScopedMatrices matrices;
-  gl::setMatricesWindowPersp( app::getWindowSize() );
-  gl::translate( _offset );
+  if (!_paused)
+    update( elapsed * _animation_speed() );
 
+  ImGui::SetNextWindowPos(vec2(_offset));
+  ImGui::Begin("Scene");
   draw();
+  ImGui::End();
 }
 
 void Scene::pause()
 {
-  _timer.stop();
-  mUpdateConnection.block();
+  _paused = true;
 }
 
 void Scene::resume()
 {
-  mUpdateConnection.resume();
-  _timer.start();
+  _paused = false;
 }
 
-void Scene::show( const app::WindowRef &window, bool useWindowBounds )
+void Scene::show( bool useWindowBounds )
 {
-  mDisplayConnection.disconnect();
-  mDisplayConnection.store( window->getSignalDraw().connect( 0, [this](){ baseDraw(); } ) );
-  if( useWindowBounds ){ setBounds( window->getBounds() ); }
 }

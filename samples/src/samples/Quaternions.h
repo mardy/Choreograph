@@ -34,16 +34,14 @@ class Quaternions : public pockets::Scene
 public:
   void setup() override;
 
-  void connect( ci::app::WindowRef window ) override;
-
   void update( ch::Time dt ) override;
 
   void draw() override;
 
-  void rotateMore( ch::MotionOptions<ci::quat> &motion );
+  void rotateMore( ch::MotionOptions<quat> &motion );
 
 private:
-  ch::Output<ci::quat>  _append_orientation;
-  ch::Output<ci::quat>  _apply_orientation;
-  ch::Output<ci::quat>  _continuous_orientation;
+  ch::Output<quat>  _append_orientation;
+  ch::Output<quat>  _apply_orientation;
+  ch::Output<quat>  _continuous_orientation;
 };
