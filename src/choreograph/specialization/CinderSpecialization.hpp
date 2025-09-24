@@ -30,15 +30,14 @@
 #include "choreograph/Sequence.hpp"
 #include "cinder/Quaternion.h"
 
-namespace  choreograph
-{
+namespace choreograph {
 /// Specialization of lerpT for quaternions to use slerping.
 /// To prevent disappearing geometry, make sure to normalize your quat targets.
-/// The final value of your tween is what you put in, so make sure it's normalized.
-template<>
-inline ci::quat lerpT( const ci::quat &start, const ci::quat &end, float time )
-{
-  return glm::normalize( glm::slerp( start, end, time ) );
+/// The final value of your tween is what you put in, so make sure it's
+/// normalized.
+template <>
+inline ci::quat lerpT(const ci::quat &start, const ci::quat &end, float time) {
+    return glm::normalize(glm::slerp(start, end, time));
 }
 
 } // namespace choreograph

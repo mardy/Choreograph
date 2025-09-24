@@ -33,19 +33,16 @@
 /// SlideAndBounce demonstrates the ProceduralPhrase.
 /// Sometimes key positions aren't the easiest way to describe a motion.
 ///
-class SlideAndBounce : public pockets::Scene
-{
+class SlideAndBounce : public pockets::Scene {
 public:
-
-  void setup() override;
-  void update( ch::Time dt ) override;
-  void draw() override;
+    void setup() override;
+    void update(ch::Time dt) override;
+    void draw() override;
 
 private:
+    ch::Output<vec2> _position_a;
+    ch::Output<vec2> _position_b;
 
-  ch::Output<vec2> _position_a;
-  ch::Output<vec2> _position_b;
-
-  ch::Output<vec2> _reference_bounce;
-  ch::Output<vec2> _reference_slide;
+    ch::Output<vec2> _reference_bounce;
+    ch::Output<vec2> _reference_slide;
 };

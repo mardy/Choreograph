@@ -29,35 +29,22 @@
 
 using namespace pockets;
 
-Scene::Scene()
-{ // start updating
+Scene::Scene() { // start updating
 }
 
-Scene::~Scene()
-{
+Scene::~Scene() {}
+
+void Scene::baseDraw(double elapsed) {
+    if (!_paused) update(elapsed * _animation_speed());
+
+    ImGui::SetNextWindowPos(vec2(_offset));
+    ImGui::Begin("Scene");
+    draw();
+    ImGui::End();
 }
 
-void Scene::baseDraw(double elapsed)
-{
-  if (!_paused)
-    update( elapsed * _animation_speed() );
+void Scene::pause() { _paused = true; }
 
-  ImGui::SetNextWindowPos(vec2(_offset));
-  ImGui::Begin("Scene");
-  draw();
-  ImGui::End();
-}
+void Scene::resume() { _paused = false; }
 
-void Scene::pause()
-{
-  _paused = true;
-}
-
-void Scene::resume()
-{
-  _paused = false;
-}
-
-void Scene::show( bool useWindowBounds )
-{
-}
+void Scene::show(bool useWindowBounds) {}

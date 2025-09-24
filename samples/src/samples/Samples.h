@@ -27,32 +27,29 @@
 
 #pragma once
 
-#include "WormBuncher.h"
+#include "BezierConstruction.h"
 #include "Quaternions.h"
 #include "Repetition.h"
-#include "BezierConstruction.h"
 #include "SlideAndBounce.h"
+#include "WormBuncher.h"
 
 using SampleRef = std::shared_ptr<pk::Scene>;
-using SampleFn = std::function<SampleRef ()>;
+using SampleFn = std::function<SampleRef()>;
 
-const std::vector<std::pair<std::string, SampleFn>> SampleList =
-{
-  { "Slide", std::make_shared<SlideAndBounce> },
-  { "Bezier", std::make_shared<BezierConstruction> },
-  { "Repetition", std::make_shared<Repetition> },
+const std::vector<std::pair<std::string, SampleFn>> SampleList = {
+    {"Slide", std::make_shared<SlideAndBounce>},
+    {"Bezier", std::make_shared<BezierConstruction>},
+    {"Repetition", std::make_shared<Repetition>},
 #if 0
   { "Worm Bunch", std::make_shared<WormBuncher> },
   { "Dev Junk", std::make_shared<Quaternions> }
 #endif
 };
 
-const std::vector<std::string> SampleNames = ([]
-{
-  std::vector<std::string> names;
-  for( auto &pair : SampleList )
-  {
-    names.push_back( pair.first );
-  }
-  return names;
+const std::vector<std::string> SampleNames = ([] {
+    std::vector<std::string> names;
+    for (auto &pair : SampleList) {
+        names.push_back(pair.first);
+    }
+    return names;
 })();

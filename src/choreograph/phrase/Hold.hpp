@@ -29,36 +29,24 @@
 
 #include "choreograph/Phrase.hpp"
 
-namespace choreograph
-{
+namespace choreograph {
 
 ///
 /// Hold is a phrase that hangs in there, never changing.
 ///
-template<typename T>
-class Hold : public Phrase<T>
-{
+template <typename T> class Hold : public Phrase<T> {
 public:
+    /// Constructs a Hold that holds \a value for \a duration.
+    Hold(Time duration, const T &value) : Phrase<T>(duration), _value(value) {}
 
-  /// Constructs a Hold that holds \a value for \a duration.
-  Hold( Time duration, const T &value ):
-    Phrase<T>( duration ),
-    _value( value )
-  {}
+    /// Constructor variant to support Sequence::then<> syntax.
+    Hold(Time duration, const T &start_value, const T &end_value)
+        : Phrase<T>(duration), _value(end_value) {}
 
-  /// Constructor variant to support Sequence::then<> syntax.
-  Hold( Time duration, const T &start_value, const T &end_value ):
-  Phrase<T>( duration ),
-  _value( end_value )
-  {}
-
-  T getValue( Time atTime ) const override
-  {
-    return _value;
-  }
+    T getValue(Time atTime) const override { return _value; }
 
 private:
-  T       _value;
+    T _value;
 };
 
 } // namespace choreograph

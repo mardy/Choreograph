@@ -29,93 +29,76 @@
 
 using namespace choreograph;
 
-Control::Control( TimelineItem *item ):
-  _item( item )
-{}
+Control::Control(TimelineItem *item) : _item(item) {}
 
-void Control::cancel()
-{
-  if( _item ){
-    _item->cancel();
-    _item = nullptr;
-  }
+void Control::cancel() {
+    if (_item) {
+        _item->cancel();
+        _item = nullptr;
+    }
 }
 
-bool Control::isValid() const
-{
-  return _item && (! _item->cancelled());
-}
+bool Control::isValid() const { return _item && (!_item->cancelled()); }
 
-bool Control::isInvalid() const
-{
-  return (_item == nullptr) || _item->cancelled();
+bool Control::isInvalid() const {
+    return (_item == nullptr) || _item->cancelled();
 }
 
 ///
 ///
 ///
 
-TimelineItem::~TimelineItem()
-{
-  if( _control ) {
-    _control->cancel();
-  }
+TimelineItem::~TimelineItem() {
+    if (_control) {
+        _control->cancel();
+    }
 }
 
-void TimelineItem::step( Time dt )
-{
-  _time += dt * _speed;
-  if( ! cancelled() ) {
-    // update properties
-    update();
-  }
-  _previous_time = _time;
+void TimelineItem::step(Time dt) {
+    _time += dt * _speed;
+    if (!cancelled()) {
+        // update properties
+        update();
+    }
+    _previous_time = _time;
 }
 
-void TimelineItem::jumpTo( Time time )
-{
-  _time = time;
-  if( ! cancelled() ) {
-    // update properties
-    update();
-  }
-  _previous_time = _time;
+void TimelineItem::jumpTo(Time time) {
+    _time = time;
+    if (!cancelled()) {
+        // update properties
+        update();
+    }
+    _previous_time = _time;
 }
 
-bool TimelineItem::isFinished() const
-{
-  if( backward() ) {
-    return time() <= 0.0f;
-  }
-  else {
-    return time() >= getDuration();
-  }
+bool TimelineItem::isFinished() const {
+    if (backward()) {
+        return time() <= 0.0f;
+    } else {
+        return time() >= getDuration();
+    }
 }
 
-void TimelineItem::resetTime()
-{
-  if( forward() ) {
-    setTime( 0.0f );
-  }
-  else {
-    setTime( getEndTime() );
-  }
+void TimelineItem::resetTime() {
+    if (forward()) {
+        setTime(0.0f);
+    } else {
+        setTime(getEndTime());
+    }
 }
 
-Time TimelineItem::getTimeUntilFinish() const
-{
-  if( forward() ) {
-    return (getDuration() / getPlaybackSpeed()) - time();
-  }
-  else {
-    return time() / getPlaybackSpeed();
-  }
+Time TimelineItem::getTimeUntilFinish() const {
+    if (forward()) {
+        return (getDuration() / getPlaybackSpeed()) - time();
+    } else {
+        return time() / getPlaybackSpeed();
+    }
 }
 
-const std::shared_ptr<Control>& TimelineItem::getControl()
-{
-  if( ! _control ) {
-    _control = std::make_shared<Control>( this );
-  }
-  return _control;
+const std::shared_ptr<Control> &TimelineItem::getControl() {
+    if (!_control) {
+        _control = std::make_shared<Control>(this);
+    }
+    return _control;
 }

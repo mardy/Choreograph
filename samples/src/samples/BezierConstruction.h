@@ -31,23 +31,23 @@
 
 /// Demonstrates how a Bezier curve is formed using Mix Phrases.
 /// Constructs a Quadratic Bezier.
-class BezierConstruction : public pk::Scene
-{
+class BezierConstruction : public pk::Scene {
 public:
-  void setup() override;
-  void update( ch::Time dt ) override;
-  void draw() override;
+    void setup() override;
+    void update(ch::Time dt) override;
+    void draw() override;
+
 private:
-  struct Point {
-    ch::Output<vec2>  _position;
-    Color             _color;
-  };
+    struct Point {
+        ch::Output<vec2> _position;
+        Color _color;
+    };
 
-  std::vector<vec2> _segments;
+    std::vector<vec2> _segments;
 
-  std::array<vec2, 4> _curve_points;
+    std::array<vec2, 4> _curve_points;
 
-  ch::Output<vec2>  _control_a;
-  ch::Output<vec2>  _control_b;
-  ch::Output<vec2>  _curve_point;
+    ch::Output<vec2> _control_a;
+    ch::Output<vec2> _control_b;
+    ch::Output<vec2> _curve_point;
 };

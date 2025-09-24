@@ -33,21 +33,21 @@
 #include <imgui.h>
 #include <string>
 
-struct Color: public ImColor {
+struct Color : public ImColor {
     using ImColor::ImColor;
 };
 
 struct vec2 {
-    vec2(double x = 0.0f, double y = 0.0f): x(x), y(y) {}
+    vec2(double x = 0.0f, double y = 0.0f) : x(x), y(y) {}
 
     vec2 &operator+=(const vec2 &o) {
         *this = *this + o;
         return *this;
     }
-    vec2 operator+(const vec2 &o) const { return { x + o.x, y + o.y }; }
-    vec2 operator-(const vec2 &o) const { return { x - o.x, y - o.y }; }
-    vec2 operator*(double s) const { return { x * s, y * s }; }
-    vec2 operator*(const vec2 &o) const { return { x * o.x, y * o.y }; }
+    vec2 operator+(const vec2 &o) const { return {x + o.x, y + o.y}; }
+    vec2 operator-(const vec2 &o) const { return {x - o.x, y - o.y}; }
+    vec2 operator*(double s) const { return {x * s, y * s}; }
+    vec2 operator*(const vec2 &o) const { return {x * o.x, y * o.y}; }
 
     operator ImVec2() const { return {float(x), float(y)}; }
 
@@ -55,18 +55,20 @@ struct vec2 {
 };
 
 struct vec3 {
-    vec3(double x = 0.0f, double y = 0.0f, double z = 0.0f): x(x), y(y), z(z) {}
+    vec3(double x = 0.0f, double y = 0.0f, double z = 0.0f)
+        : x(x), y(y), z(z) {}
 
-    vec3 operator+(const vec3 &o) const { return { x + o.x, y + o.y, z + o.z }; }
-    vec3 operator-(const vec3 &o) const { return { x - o.x, y - o.y, z - o.z }; }
-    vec3 operator*(double s) const { return { x * s, y * s, z * s }; }
+    vec3 operator+(const vec3 &o) const { return {x + o.x, y + o.y, z + o.z}; }
+    vec3 operator-(const vec3 &o) const { return {x - o.x, y - o.y, z - o.z}; }
+    vec3 operator*(double s) const { return {x * s, y * s, z * s}; }
 
 private:
     double x, y, z;
 };
 
 struct quat {
-    quat(double x = 0.0f, double y = 0.0f, double z = 0.0f, double w = 0.0f): x(x), y(y), z(z), w(w) {}
+    quat(double x = 0.0f, double y = 0.0f, double z = 0.0f, double w = 0.0f)
+        : x(x), y(y), z(z), w(w) {}
 
 private:
     double x, y, z, w;
@@ -76,74 +78,75 @@ struct mat4 {
     double a[4][4];
 };
 
-namespace pockets
-{
-  /**
-   A basic application layer encapsulating input and view controls
+namespace pockets {
+/**
+ A basic application layer encapsulating input and view controls
 
-   Renderable
-   Updatable, pausable (always calls its own update on app signal unless paused)
-   Listens for UI events
+ Renderable
+ Updatable, pausable (always calls its own update on app signal unless paused)
+ Listens for UI events
 
-   Eventually, would like to make a simple scene-graph-like setup of:
-   Connectable -> can connect itself to window stuff
-   Renderable -> can be drawn to screen
-   Maybe Runnable -> can/expects to be updated at 60Hz
+ Eventually, would like to make a simple scene-graph-like setup of:
+ Connectable -> can connect itself to window stuff
+ Renderable -> can be drawn to screen
+ Maybe Runnable -> can/expects to be updated at 60Hz
 
-   Scene graph would be useful primarily for laying out a simple GUI.
-   Simple scene graph is implemented as Nodes in scene2d.
-   */
-  typedef std::shared_ptr<class Scene> SceneRef;
-	class Scene
-	{
-	public:
-    typedef std::function<void ()> Callback;
+ Scene graph would be useful primarily for laying out a simple GUI.
+ Simple scene graph is implemented as Nodes in scene2d.
+ */
+typedef std::shared_ptr<class Scene> SceneRef;
+class Scene {
+public:
+    typedef std::function<void()> Callback;
     Scene();
     virtual ~Scene();
-    /// Set up scene when OpenGL context is guaranteed to exist (in or after app::setup())
-    virtual void  setup() {}
+    /// Set up scene when OpenGL context is guaranteed to exist (in or after
+    /// app::setup())
+    virtual void setup() {}
 
     /// temporarily freeze updates
-    void          pause();
+    void pause();
 
     /// continue receiving updates
-    void          resume();
+    void resume();
 
     /// update content
-    virtual void  update( ch::Time dt ){}
+    virtual void update(ch::Time dt) {}
 
     void baseDraw(ch::Time dt);
 
     /// render content
-    virtual void  draw() {}
+    virtual void draw() {}
 
     /// Returns a pointer to the Scene's offset for animation.
-    ch::Output<vec2>* getOffsetOutput() { return &_offset; }
+    ch::Output<vec2> *getOffsetOutput() { return &_offset; }
 
-    void setOffset( const vec2 &offset ) { _offset = offset; }
+    void setOffset(const vec2 &offset) { _offset = offset; }
 
-    ch::Output<ch::Time>* getAnimationSpeedOutput() { return &_animation_speed; }
+    ch::Output<ch::Time> *getAnimationSpeedOutput() {
+        return &_animation_speed;
+    }
 
     /// returns the bounds of the controller in points
-    ImVec4      getBounds() const { return _bounds; }
+    ImVec4 getBounds() const { return _bounds; }
 
     /// set the region of screen into which we should draw this view
-    void          setBounds( const ImVec4 &points ){ _bounds = points; }
+    void setBounds(const ImVec4 &points) { _bounds = points; }
 
     void setSize(const vec2 &size) { _size = size; }
     vec2 getSize() const { return _size; }
 
-    void show(bool useWindowBounds = true );
+    void show(bool useWindowBounds = true);
     /// Returns a reference to our timeline.
-    choreograph::Timeline& timeline() { return _timeline; }
+    choreograph::Timeline &timeline() { return _timeline; }
 
-	private:
-    ch::Output<vec2>    _offset = vec2( 0 );
-    ch::Output<ch::Time>    _animation_speed = 1;
-    ImVec4                _bounds;
+private:
+    ch::Output<vec2> _offset = vec2(0);
+    ch::Output<ch::Time> _animation_speed = 1;
+    ImVec4 _bounds;
 
-    choreograph::Timeline   _timeline;
+    choreograph::Timeline _timeline;
     bool _paused = false;
     vec2 _size;
-	};
-}
+};
+} // namespace pockets
