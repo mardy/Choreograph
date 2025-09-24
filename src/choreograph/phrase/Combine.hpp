@@ -49,9 +49,9 @@ public:
 
   MixPhrase( const PhraseRef<T> &a, const PhraseRef<T> &b, float mix = 0.5f, const LerpFn &fn = &lerpT<T> ):
     Phrase<T>( std::max( a->getDuration(), b->getDuration() ) ),
+    _mix( mix ),
     _a( a ),
     _b( b ),
-    _mix( mix ),
     _lerp_fn( fn )
   {}
 
