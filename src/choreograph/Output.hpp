@@ -81,6 +81,9 @@ public:
         return *this;
     }
 
+    bool operator==(const Output<T> &o) const { return _value == o._value; }
+    bool operator==(const T &value) const { return _value == value; }
+
     /// Returns value of output.
     const T &value() const { return _value; }
 
