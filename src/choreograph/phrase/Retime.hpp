@@ -124,9 +124,9 @@ class ClipPhrase : public Phrase<T>
 public:
   ClipPhrase( const PhraseRef<T> &source, Time begin, Time end ):
     Phrase<T>( end - begin ),
+    _source( source ),
     _begin( begin ),
-    _end( end ),
-    _source( source )
+    _end( end )
   {}
 
   T getValue( Time atTime ) const override { return _source->getValue( clampTime( _begin + atTime ) ); }

@@ -62,23 +62,23 @@ public:
   {}
 
   Motion( T *target, const SequenceT &sequence ):
-    _target( target ),
-    _source( sequence )
+    _source( sequence ),
+    _target( target )
   {}
 
   Motion( Output<T> *target, const SequenceT &sequence ):
-    _target( target->valuePtr() ),
+    _source( sequence ),
     _output( target ),
-    _source( sequence )
+    _target( target->valuePtr() )
   {
     _output->disconnect();
     _output->_input = this;
   }
 
   Motion( Output<T> *target ):
-    _target( target->valuePtr() ),
+    _source( target->value() ),
     _output( target ),
-    _source( target->value() )
+    _target( target->valuePtr() )
   {
     _output->disconnect();
     _output->_input = this;
