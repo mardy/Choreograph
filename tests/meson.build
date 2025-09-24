@@ -14,6 +14,9 @@ tests = [
 foreach t: tests
   exe = executable(t,
     t + '.cpp',
+    override_options: [
+      'cpp_std=c++14',
+    ],
     dependencies: [
       choreograph_dep,
     ])
