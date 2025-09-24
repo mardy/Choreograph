@@ -1,0 +1,5 @@
+BasedOnStyle: LLVM
+
+AccessModifierOffset: -4
+AllowShortIfStatementsOnASingleLine: WithoutElse
+IndentWidth: 4
