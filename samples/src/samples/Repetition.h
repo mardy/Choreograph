@@ -33,36 +33,34 @@
 /// Demonstrates different kinds of looping effects:
 /// Motion looping, Group looping, and Loop Phrases.
 ///
-class Repetition : public pk::Scene
-{
+class Repetition : public pk::Scene {
 public:
-  void setup() override;
-  void update( ch::Time dt ) override;
-  void draw() override;
+    void setup() override;
+    void update(ch::Time dt) override;
+    void draw() override;
+
 private:
-  struct Point {
+    struct Point {
 #if defined(CINDER_MSW)
-    Point( ch::Output<vec2> &&position, const ImU32 &color, const std::string &description ):
-      _position( std::move( position ) ),
-      _color( color ),
-      _description( description )
-    {}
-    Point() = default;
-    Point( Point &&rhs ):
-      _position( std::move( rhs._position ) ),
-      _color( std::move( rhs._color ) ),
-      _description( std::move( rhs._description) )
-    {}
-    Point( const Point &rhs ) = delete;
+        Point(ch::Output<vec2> &&position, const ImU32 &color,
+              const std::string &description)
+            : _position(std::move(position)), _color(color),
+              _description(description) {}
+        Point() = default;
+        Point(Point &&rhs)
+            : _position(std::move(rhs._position)),
+              _color(std::move(rhs._color)),
+              _description(std::move(rhs._description)) {}
+        Point(const Point &rhs) = delete;
 #endif
-    ch::Output<vec2>      _position;
-    Color                 _color;
-    std::string           _description;
-  };
+        ch::Output<vec2> _position;
+        Color _color;
+        std::string _description;
+    };
 
-  std::vector<Point> mTargets;
+    std::vector<Point> mTargets;
 
-  // For grouped motion, we'll use these two properties.
-  ch::Output<vec2>  _position;
-  ch::Output<vec3>  _rotation;
+    // For grouped motion, we'll use these two properties.
+    ch::Output<vec2> _position;
+    ch::Output<vec3> _rotation;
 };

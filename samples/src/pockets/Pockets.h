@@ -32,7 +32,5 @@
 
  Hopefully you can find some things of use to you here.
  */
-namespace pockets
-{
-}
+namespace pockets {}
 namespace pk = pockets;

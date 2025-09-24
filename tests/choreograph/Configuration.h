@@ -27,15 +27,14 @@
 
 #pragma once
 
-namespace choreograph
-{
+namespace choreograph {
 
 ///
 /// Choreograph uses float to measure Time by default.
 /// Add this file to your project include path as Configuration.h
 /// This is set up as an alias so it's easier to change out if needed.
-/// Floats lose precision pretty quickly, but they're fast and don't take up much space.
-/// Switch to double if you need more precision.
+/// Floats lose precision pretty quickly, but they're fast and don't take up
+/// much space. Switch to double if you need more precision.
 ///
 
 using Time = double;

@@ -27,33 +27,30 @@
 
 #pragma once
 
-#include <cmath>
-#include <memory>
-#include <functional>
-#include <vector>
 #include <array>
+#include <cmath>
+#include <functional>
+#include <memory>
+#include <vector>
 
-namespace choreograph
-{
+namespace choreograph {
 
 ///
 /// Choreograph uses float to measure Time by default.
 /// This is set up as an alias so it's easier to change out if needed.
-/// Floats lose precision pretty quickly, but they're fast and don't take up much space.
-/// Switch to double if you need more precision.
+/// Floats lose precision pretty quickly, but they're fast and don't take up
+/// much space. Switch to double if you need more precision.
 ///
 
 using Time = double;
 
 /// Wrap \a time past \a duration around \a inflectionPoint.
-inline Time wrapTime( Time time, Time duration, Time inflectionPoint=0.0f )
-{
-  if( time > duration ) {
-    return inflectionPoint + std::fmod( time, duration - inflectionPoint );
-  }
-  else {
-    return time;
-  }
+inline Time wrapTime(Time time, Time duration, Time inflectionPoint = 0.0f) {
+    if (time > duration) {
+        return inflectionPoint + std::fmod(time, duration - inflectionPoint);
+    } else {
+        return time;
+    }
 }
 
 } // namespace choreograph

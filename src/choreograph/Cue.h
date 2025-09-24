@@ -29,28 +29,26 @@
 
 #include "TimelineItem.h"
 
-namespace choreograph
-{
+namespace choreograph {
 
 ///
 /// Calls a function after time has elapsed.
 ///
-class Cue : public TimelineItem
-{
+class Cue : public TimelineItem {
 public:
-  Cue() = delete;
+    Cue() = delete;
 
-  /// Creates a cue from a function and a delay.
-  Cue( const std::function<void ()> &fn, Time delay );
+    /// Creates a cue from a function and a delay.
+    Cue(const std::function<void()> &fn, Time delay);
 
-  /// Calls cue function if time threshold has been crossed.
-  void update() final override;
+    /// Calls cue function if time threshold has been crossed.
+    void update() final override;
 
-  /// Cues are instantaneous.
-  Time getDuration() const final override { return 0.0f; }
+    /// Cues are instantaneous.
+    Time getDuration() const final override { return 0.0f; }
 
 private:
-  std::function<void ()>    _cue;
+    std::function<void()> _cue;
 };
 
 } // namespace choreograph

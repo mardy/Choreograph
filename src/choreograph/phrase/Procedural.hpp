@@ -29,34 +29,29 @@
 
 #include "choreograph/Phrase.hpp"
 
-namespace choreograph
-{
+namespace choreograph {
 
 ///
 /// AnalyticChange is a phrase that calls a std::function every step.
-/// You could do similar things with a Motion's updateFn, but this is composable within Sequences.
+/// You could do similar things with a Motion's updateFn, but this is composable
+/// within Sequences.
 ///
-template<typename T>
-class ProceduralPhrase : public Phrase<T>
-{
+template <typename T> class ProceduralPhrase : public Phrase<T> {
 public:
-  /// Analytic Function receives start, end, and normalized time.
-  /// Most basic would be mix( a, b, t ) or lerp( a, b, t ).
-  /// Intended use is to apply something like cos() or random jitter.
-  using Function = std::function<T (Time normalizedTime, Time duration)>;
+    /// Analytic Function receives start, end, and normalized time.
+    /// Most basic would be mix( a, b, t ) or lerp( a, b, t ).
+    /// Intended use is to apply something like cos() or random jitter.
+    using Function = std::function<T(Time normalizedTime, Time duration)>;
 
-  ProceduralPhrase( Time duration, const Function &fn ):
-    Phrase<T>( duration ),
-    _function( fn )
-  {}
+    ProceduralPhrase(Time duration, const Function &fn)
+        : Phrase<T>(duration), _function(fn) {}
 
-  T getValue( Time atTime ) const override
-  {
-    return _function( this->normalizeTime( atTime ), this->getDuration() );
-  }
+    T getValue(Time atTime) const override {
+        return _function(this->normalizeTime(atTime), this->getDuration());
+    }
 
 private:
-  Function  _function;
+    Function _function;
 };
 
 } // namespace choreograph

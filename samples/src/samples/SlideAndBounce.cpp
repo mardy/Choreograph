@@ -30,59 +30,62 @@
 using namespace choreograph;
 using namespace std;
 
-void SlideAndBounce::setup()
-{
+void SlideAndBounce::setup() {
 
-  // Create a procedural phrase that moves vertically on a sine wave.
-  // Procedural phrases can evaluate any function you like.
-  PhraseRef<vec2> bounce = makeProcedure<vec2>( 2.0, [] ( Time t, Time duration ) {
-    return vec2( 0, sin( easeInOutQuad(t) * 6 * M_PI ) * 100.0f );
-  } );
+    // Create a procedural phrase that moves vertically on a sine wave.
+    // Procedural phrases can evaluate any function you like.
+    PhraseRef<vec2> bounce =
+        makeProcedure<vec2>(2.0, [](Time t, Time duration) {
+            return vec2(0, sin(easeInOutQuad(t) * 6 * M_PI) * 100.0f);
+        });
 
-  // Create a ramp phrase from the left to the right side of the window.
-  //float w = (float)ImGui::GetIO().DisplaySize.x;
-  float w = (float)getSize().x;
-  float x1 = w * 0.08f;
-  float x2 = w - x1;
-  PhraseRef<vec2> slide = makeRamp( vec2( x1, 0 ), vec2( x2, 0 ), 2.0f, EaseInOutCubic() );
+    // Create a ramp phrase from the left to the right side of the window.
+    // float w = (float)ImGui::GetIO().DisplaySize.x;
+    float w = (float)getSize().x;
+    float x1 = w * 0.08f;
+    float x2 = w - x1;
+    PhraseRef<vec2> slide =
+        makeRamp(vec2(x1, 0), vec2(x2, 0), 2.0f, EaseInOutCubic());
 
-  // Combine the slide and bounce phrases using an AccumulatePhrase.
-  // By default, the accumulation operation sums all the phrase values with an initial value.
-  float center_y = getSize().y / 2.0f;
-  PhraseRef<vec2> bounce_and_slide = makeAccumulator( vec2( 0, center_y ), bounce, slide );
+    // Combine the slide and bounce phrases using an AccumulatePhrase.
+    // By default, the accumulation operation sums all the phrase values with an
+    // initial value.
+    float center_y = getSize().y / 2.0f;
+    PhraseRef<vec2> bounce_and_slide =
+        makeAccumulator(vec2(0, center_y), bounce, slide);
 
-  // Provide an explicit combine function.
-  // In this case, we subtract each value from the initial value.
-  PhraseRef<vec2> bounce_and_slide_negative = makeAccumulator( vec2( w, center_y ), bounce, slide, [] (const vec2 &a, const vec2 &b) {
-    return a - b;
-  } );
+    // Provide an explicit combine function.
+    // In this case, we subtract each value from the initial value.
+    PhraseRef<vec2> bounce_and_slide_negative =
+        makeAccumulator(vec2(w, center_y), bounce, slide,
+                        [](const vec2 &a, const vec2 &b) { return a - b; });
 
-  // Apply our Sequences to Outputs.
-  timeline().apply( &_position_a, bounce_and_slide );
-  timeline().apply( &_position_b, bounce_and_slide_negative );
-  timeline().apply( &_reference_bounce, bounce );
-  timeline().apply( &_reference_slide, slide );
+    // Apply our Sequences to Outputs.
+    timeline().apply(&_position_a, bounce_and_slide);
+    timeline().apply(&_position_b, bounce_and_slide_negative);
+    timeline().apply(&_reference_bounce, bounce);
+    timeline().apply(&_reference_slide, slide);
 
-  // Place Outputs at initial sequence values.
-  timeline().jumpTo( 0 );
+    // Place Outputs at initial sequence values.
+    timeline().jumpTo(0);
 }
 
-void SlideAndBounce::update( Time dt )
-{
-  timeline().step( dt );
-}
+void SlideAndBounce::update(Time dt) { timeline().step(dt); }
 
-void SlideAndBounce::draw()
-{
-  ImDrawList *list = ImGui::GetWindowDrawList();
-  list->AddCircleFilled( vec2(_position_a), 30.0f, Color::HSV( 0.72f, 1.0f, 1.0f ) );
+void SlideAndBounce::draw() {
+    ImDrawList *list = ImGui::GetWindowDrawList();
+    list->AddCircleFilled(vec2(_position_a), 30.0f,
+                          Color::HSV(0.72f, 1.0f, 1.0f));
 
-  list->AddCircleFilled( vec2(_position_b), 30.0f, Color::HSV( 0.96f, 1.0f, 1.0f ) );
+    list->AddCircleFilled(vec2(_position_b), 30.0f,
+                          Color::HSV(0.96f, 1.0f, 1.0f));
 
-  // References are translated for visibility.
-  float y = ImGui::GetWindowHeight() * 0.2f;
-  auto color = Color::HSV( 0.15f, 1.0f, 1.0f );
+    // References are translated for visibility.
+    float y = ImGui::GetWindowHeight() * 0.2f;
+    auto color = Color::HSV(0.15f, 1.0f, 1.0f);
 
-  list->AddCircle( _reference_bounce() + vec2( ImGui::GetWindowWidth() * 0.08f, y ), 4.0f, color );
-  list->AddCircle( _reference_slide() + vec2( 0, y ), 4.0f, color );
+    list->AddCircle(_reference_bounce() +
+                        vec2(ImGui::GetWindowWidth() * 0.08f, y),
+                    4.0f, color);
+    list->AddCircle(_reference_slide() + vec2(0, y), 4.0f, color);
 }

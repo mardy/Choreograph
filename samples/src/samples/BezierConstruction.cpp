@@ -30,105 +30,93 @@
 #include <iostream>
 using namespace choreograph;
 
-void BezierConstruction::setup()
-{
-  float w = getSize().x;
-  float h = getSize().y;
-  _curve_points = {
-    vec2( w * 0.08f, h * 0.86f ),
-    vec2( w * 0.08f, h * 0.14f ),
-    vec2( w * 0.92f, h * 0.14f ),
-    vec2( w * 0.92f, h * 0.86f )
-  };
+void BezierConstruction::setup() {
+    float w = getSize().x;
+    float h = getSize().y;
+    _curve_points = {vec2(w * 0.08f, h * 0.86f), vec2(w * 0.08f, h * 0.14f),
+                     vec2(w * 0.92f, h * 0.14f), vec2(w * 0.92f, h * 0.86f)};
 
-  const float duration = 1.5f;
+    const float duration = 1.5f;
 
-  // Ramp from anchor point to control point.
-  auto ramp_a = makeRamp( _curve_points[0], _curve_points[1], duration );
-  // Ramp from control point to anchor point.
-  auto ramp_b = makeRamp( _curve_points[2], _curve_points[3], duration );
+    // Ramp from anchor point to control point.
+    auto ramp_a = makeRamp(_curve_points[0], _curve_points[1], duration);
+    // Ramp from control point to anchor point.
+    auto ramp_b = makeRamp(_curve_points[2], _curve_points[3], duration);
 
-  // Lerp between control ramps.
-  auto bezier_point = makeBlend<vec2>( ramp_a, ramp_b, 0.0f );
+    // Lerp between control ramps.
+    auto bezier_point = makeBlend<vec2>(ramp_a, ramp_b, 0.0f);
 
-  timeline().setDefaultRemoveOnFinish( false );
+    timeline().setDefaultRemoveOnFinish(false);
 
-  auto group = std::make_shared<ch::Timeline>();
-  group->setDefaultRemoveOnFinish( false );
-  group->setRemoveOnFinish( false );
+    auto group = std::make_shared<ch::Timeline>();
+    group->setDefaultRemoveOnFinish(false);
+    group->setRemoveOnFinish(false);
 
-  // Animate our control points along their respective ramps.
-  group->apply<vec2>( &_control_a, ramp_a );
-  group->apply<vec2>( &_control_b, ramp_b );
+    // Animate our control points along their respective ramps.
+    group->apply<vec2>(&_control_a, ramp_a);
+    group->apply<vec2>(&_control_b, ramp_b);
 
-  // Animate the mix of the bezier point from a to b.
-  group->apply<float>( bezier_point->getMixOutput(), makeRamp( 0.0f, 1.0f, duration ) );
+    // Animate the mix of the bezier point from a to b.
+    group->apply<float>(bezier_point->getMixOutput(),
+                        makeRamp(0.0f, 1.0f, duration));
 
-  // Apply the bezier_point animation to our curve point variable.
-  group->apply<vec2>( &_curve_point, bezier_point )
-    .startFn( [this] {
-      _segments.clear();
-      _segments.push_back( _curve_points[0] );
-    } )
-    .updateFn( [this] {
-      _segments.push_back( _curve_point );
-    } );
+    // Apply the bezier_point animation to our curve point variable.
+    group->apply<vec2>(&_curve_point, bezier_point)
+        .startFn([this] {
+            _segments.clear();
+            _segments.push_back(_curve_points[0]);
+        })
+        .updateFn([this] { _segments.push_back(_curve_point); });
 
-  // When all our animations finish, cue the group to restart after a delay.
-  group->setFinishFn( [this, group] () {
-    timeline()
-      .cue( [group] {
-        group->resetTime();
-      }, 0.5f )
-      .removeOnFinish( true );
-  } );
+    // When all our animations finish, cue the group to restart after a delay.
+    group->setFinishFn([this, group]() {
+        timeline()
+            .cue([group] { group->resetTime(); }, 0.5f)
+            .removeOnFinish(true);
+    });
 
-  // Move our grouping timeline onto our main timeline.
-  // This will update our group as the main timeline progresses.
-  timeline().addShared( group );
+    // Move our grouping timeline onto our main timeline.
+    // This will update our group as the main timeline progresses.
+    timeline().addShared(group);
 
-  // place things at initial timelined values.
-  timeline().jumpTo( 0 );
+    // place things at initial timelined values.
+    timeline().jumpTo(0);
 }
 
-void BezierConstruction::update( Time dt )
-{
-  timeline().step( dt );
-}
+void BezierConstruction::update(Time dt) { timeline().step(dt); }
 
-void BezierConstruction::draw()
-{
-  Color curve_color( 1.0f, 1.0f, 0.0f );
-  Color control_color( 1.0f, 0.0f, 1.0f );
-  Color line_color( 0.0f, 1.0f, 1.0f );
-  Color future_color( 1.0f, 1.0f, 1.0f );
+void BezierConstruction::draw() {
+    Color curve_color(1.0f, 1.0f, 0.0f);
+    Color control_color(1.0f, 0.0f, 1.0f);
+    Color line_color(0.0f, 1.0f, 1.0f);
+    Color future_color(1.0f, 1.0f, 1.0f);
 
-  ImDrawList *list = ImGui::GetWindowDrawList();
+    ImDrawList *list = ImGui::GetWindowDrawList();
 
-  // Draw our curve.
-  for( auto &segment : _segments ) {
-    list->PathLineTo( segment );
-  }
-  list->PathStroke(line_color);
+    // Draw our curve.
+    for (auto &segment : _segments) {
+        list->PathLineTo(segment);
+    }
+    list->PathStroke(line_color);
 
-  // Draw our curve's static control points.
-  for( auto &point : _curve_points ) {
-    list->AddCircleFilled( point, 6.0f, line_color );
-  }
+    // Draw our curve's static control points.
+    for (auto &point : _curve_points) {
+        list->AddCircleFilled(point, 6.0f, line_color);
+    }
 
-  // Draw the paths traveled by our animating control points.
-  list->AddLine( _curve_points[0], _curve_points[1], line_color );
-  list->AddLine( _curve_points[2], _curve_points[3], line_color );
+    // Draw the paths traveled by our animating control points.
+    list->AddLine(_curve_points[0], _curve_points[1], line_color);
+    list->AddLine(_curve_points[2], _curve_points[3], line_color);
 
-  // Draw our animating control points.
-  list->AddCircleFilled( vec2(_control_a), 10.0f, control_color );
-  list->AddCircleFilled( vec2(_control_b), 10.0f, control_color );
+    // Draw our animating control points.
+    list->AddCircleFilled(vec2(_control_a), 10.0f, control_color);
+    list->AddCircleFilled(vec2(_control_b), 10.0f, control_color);
 
-  // Draw our curve point's tangent line.
-  list->AddLine( vec2(_curve_point), vec2(_control_b), future_color );
-  list->AddLine( vec2(_control_a), vec2(_curve_point), curve_color );
-  // And our leading curve point.
-  list->AddCircle( vec2(_curve_point), 12.0f, curve_color );
+    // Draw our curve point's tangent line.
+    list->AddLine(vec2(_curve_point), vec2(_control_b), future_color);
+    list->AddLine(vec2(_control_a), vec2(_curve_point), curve_color);
+    // And our leading curve point.
+    list->AddCircle(vec2(_curve_point), 12.0f, curve_color);
 
-  list->AddText( _curve_point() - vec2( 0, 16 ), curve_color, "Bezier Path" );
+    list->AddText(_curve_point() - vec2(0, 16), curve_color, "Bezier Path");
 }

@@ -31,90 +31,99 @@
 using namespace choreograph;
 using namespace cinder;
 
-void WormBuncher::setup()
-{
-  const int count = 64;
-  Sequence<quat> spin{ quat() };
-  // would be easier as a floating point angle
-  spin.then<RampTo>( glm::angleAxis<float>( M_PI / 2.0f, vec3( 0, 1, 0 ) ), 0.5f )
-    .then<RampTo>( glm::angleAxis<float>( M_PI, vec3( 0, 1, 0 ) ), 0.5f )
-    .then<RampTo>( glm::angleAxis<float>( M_PI * 3 / 2, vec3( 0, 1, 0 ) ), 0.5f )
-    .then<RampTo>( glm::angleAxis<float>( 0, vec3( 0, 1, 0 ) ), 0.5f );
+void WormBuncher::setup() {
+    const int count = 64;
+    Sequence<quat> spin{quat()};
+    // would be easier as a floating point angle
+    spin.then<RampTo>(glm::angleAxis<float>(M_PI / 2.0f, vec3(0, 1, 0)), 0.5f)
+        .then<RampTo>(glm::angleAxis<float>(M_PI, vec3(0, 1, 0)), 0.5f)
+        .then<RampTo>(glm::angleAxis<float>(M_PI * 3 / 2, vec3(0, 1, 0)), 0.5f)
+        .then<RampTo>(glm::angleAxis<float>(0, vec3(0, 1, 0)), 0.5f);
 
-  for( int i = 0; i < count; ++i )
-  {
-    WormSegment segment;
+    for (int i = 0; i < count; ++i) {
+        WormSegment segment;
 
-    vec3 pos( 0 );
-    pos.x = lmap<float>( i, 0, count - 1, 50, app::getWindowWidth() - 50 );
-    pos.y = app::getWindowHeight() / 2 + sin( pos.x * 0.01f ) * 80.0f;
+        vec3 pos(0);
+        pos.x = lmap<float>(i, 0, count - 1, 50, app::getWindowWidth() - 50);
+        pos.y = app::getWindowHeight() / 2 + sin(pos.x * 0.01f) * 80.0f;
 
-    segment.position().x = pos.x - 150.0f;
-    segment.position().y = pos.y + 150.0f;
+        segment.position().x = pos.x - 150.0f;
+        segment.position().y = pos.y + 150.0f;
 
-    segment.color = Color( CM_HSV, mix( 0.3f, 0.7f, randFloat() ), 1.0f, 0.95f );
+        segment.color =
+            Color(CM_HSV, mix(0.3f, 0.7f, randFloat()), 1.0f, 0.95f);
 
-    quat back = normalize( glm::angleAxis<float>( M_PI / 2.0f, vec3( 1, 0, 0 ) ) * glm::angleAxis<float>( M_PI / 4.0f, vec3( 0, 1, 0 ) ) );
-    quat front;
+        quat back =
+            normalize(glm::angleAxis<float>(M_PI / 2.0f, vec3(1, 0, 0)) *
+                      glm::angleAxis<float>(M_PI / 4.0f, vec3(0, 1, 0)));
+        quat front;
 
-    // Delay Motions by offsetting their start times.
-    // Their values will be clamped to the start value until start time.
-    float delay = (i * 0.05f);
-    timeline().apply( &segment.position ).then<RampTo3>( pos, 0.44f, EaseOutCubic(), EaseOutQuad() ).setStartTime( delay );
-    timeline().apply( &segment.orientation ).set( back ).then<RampTo>( front, 0.44f, EaseInOutAtan() ).setStartTime( delay );
-    timeline().apply( &segment.alpha ).setStartTime( delay ).then<RampTo>( 1.0f, 0.16f );
+        // Delay Motions by offsetting their start times.
+        // Their values will be clamped to the start value until start time.
+        float delay = (i * 0.05f);
+        timeline()
+            .apply(&segment.position)
+            .then<RampTo3>(pos, 0.44f, EaseOutCubic(), EaseOutQuad())
+            .setStartTime(delay);
+        timeline()
+            .apply(&segment.orientation)
+            .set(back)
+            .then<RampTo>(front, 0.44f, EaseInOutAtan())
+            .setStartTime(delay);
+        timeline()
+            .apply(&segment.alpha)
+            .setStartTime(delay)
+            .then<RampTo>(1.0f, 0.16f);
 
-    _segments.emplace_back( std::move( segment ) );
-  }
-
+        _segments.emplace_back(std::move(segment));
+    }
 }
 
-void WormBuncher::connect( app::WindowRef window )
-{
-  auto seekPoint = [this] ( const ivec2 &point ) {
-    vec3 center( point, 0.0f );
-    vec3 bounds( 100 );
-    float delay = 0.0f;
-    for( auto &segment : _segments ) {
-      vec3 pos = randVec3() * bounds + center;
-      timeline().append( &segment.position ).hold( delay ).then<RampTo3>( pos, 0.5f, EaseInOutQuad(), EaseInOutCubic(), EaseInOutAtan() );
+void WormBuncher::connect(app::WindowRef window) {
+    auto seekPoint = [this](const ivec2 &point) {
+        vec3 center(point, 0.0f);
+        vec3 bounds(100);
+        float delay = 0.0f;
+        for (auto &segment : _segments) {
+            vec3 pos = randVec3() * bounds + center;
+            timeline()
+                .append(&segment.position)
+                .hold(delay)
+                .then<RampTo3>(pos, 0.5f, EaseInOutQuad(), EaseInOutCubic(),
+                               EaseInOutAtan());
 
-      delay += 0.005f;
-    }
-  };
+            delay += 0.005f;
+        }
+    };
 
-
-#if defined( CINDER_COCOA_TOUCH )
-  storeConnection( window->getSignalTouchesBegan().connect( [seekPoint] ( const app::TouchEvent &event ) {
-    for( auto &touch : event.getTouches() ) {
-      seekPoint( touch.getPos() );
-    }
-  } ) );
+#if defined(CINDER_COCOA_TOUCH)
+    storeConnection(window->getSignalTouchesBegan().connect(
+        [seekPoint](const app::TouchEvent &event) {
+            for (auto &touch : event.getTouches()) {
+                seekPoint(touch.getPos());
+            }
+        }));
 #else
-  storeConnection( window->getSignalMouseDown().connect( [seekPoint] ( const app::MouseEvent &event ) {
-    seekPoint( event.getPos() );
-  } ) );
+    storeConnection(window->getSignalMouseDown().connect(
+        [seekPoint](const app::MouseEvent &event) {
+            seekPoint(event.getPos());
+        }));
 #endif
 }
 
-void WormBuncher::update( Time dt )
-{
-  timeline().step( dt );
-}
+void WormBuncher::update(Time dt) { timeline().step(dt); }
 
-void WormBuncher::draw()
-{
-  gl::ScopedBlendAlpha blend;
+void WormBuncher::draw() {
+    gl::ScopedBlendAlpha blend;
 
-  gl::drawString( "Worm Buncher. Click/touch to interact.", vec2( 10, 30 ) );
+    gl::drawString("Worm Buncher. Click/touch to interact.", vec2(10, 30));
 
-  for( auto &segment : _segments )
-  {
-    gl::ScopedModelMatrix matrix;
-    gl::translate( segment.position );
-    gl::rotate( segment.orientation );
+    for (auto &segment : _segments) {
+        gl::ScopedModelMatrix matrix;
+        gl::translate(segment.position);
+        gl::rotate(segment.orientation);
 
-    gl::ScopedColor color( ColorA( segment.color, segment.alpha ) );
-    gl::drawSolidCircle( vec2( 0 ), 20.0f );
-  }
+        gl::ScopedColor color(ColorA(segment.color, segment.alpha));
+        gl::drawSolidCircle(vec2(0), 20.0f);
+    }
 }

@@ -30,15 +30,15 @@
 // Timeline.h includes most of Choreograph.
 #include "Timeline.h"
 
-#include "phrase/Ramp.hpp"
-#include "phrase/Hold.hpp"
-#include "phrase/Retime.hpp"
 #include "phrase/Combine.hpp"
+#include "phrase/Hold.hpp"
 #include "phrase/Procedural.hpp"
+#include "phrase/Ramp.hpp"
+#include "phrase/Retime.hpp"
 #include "phrase/Sugar.hpp"
 
-#if defined( CINDER_CINDER )
-  #include "specialization/CinderSpecialization.hpp"
+#if defined(CINDER_CINDER)
+#include "specialization/CinderSpecialization.hpp"
 #endif
 
 ///

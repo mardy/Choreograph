@@ -29,40 +29,36 @@
 
 #include "pockets/Scene.h"
 
-struct WormSegment
-{
+struct WormSegment {
 #if defined(CINDER_MSW)
-  WormSegment() = default;
-  // We need to provide a move constructor for VS2013 to use instead of copy construction.
-  // Clang auto-generates the move constructor for us, so it's not needed on OSX.
-  // We should be able to declare move-ctor as default, but VS2013 doesn't support this yet.
-  // http://msdn.microsoft.com/en-us/library/dn457344.aspx
-  // WormSegment( WormSegment &&rhs ) = default;
-  WormSegment( WormSegment &&rhs ):
-    color( std::move( rhs.color ) ),
-    alpha( std::move( rhs.alpha ) ),
-    position( std::move( rhs.position ) ),
-    orientation( std::move( rhs.orientation ) )
-  {}
-  WormSegment( const WormSegment &rhs ) = delete;
+    WormSegment() = default;
+    // We need to provide a move constructor for VS2013 to use instead of copy
+    // construction. Clang auto-generates the move constructor for us, so it's
+    // not needed on OSX. We should be able to declare move-ctor as default, but
+    // VS2013 doesn't support this yet.
+    // http://msdn.microsoft.com/en-us/library/dn457344.aspx
+    // WormSegment( WormSegment &&rhs ) = default;
+    WormSegment(WormSegment &&rhs)
+        : color(std::move(rhs.color)), alpha(std::move(rhs.alpha)),
+          position(std::move(rhs.position)),
+          orientation(std::move(rhs.orientation)) {}
+    WormSegment(const WormSegment &rhs) = delete;
 #endif
 
-  ImU32             color;
-  ch::Output<float>     alpha = 0.0f;
-  ch::Output<vec3>  position;
-  ch::Output<quat>  orientation;
+    ImU32 color;
+    ch::Output<float> alpha = 0.0f;
+    ch::Output<vec3> position;
+    ch::Output<quat> orientation;
 };
 
-class WormBuncher : public pk::Scene
-{
+class WormBuncher : public pk::Scene {
 public:
+    void setup() override;
 
-  void setup() override;
+    void update(ch::Time dt) override;
 
-  void update( ch::Time dt ) override;
-
-  void draw() override;
+    void draw() override;
 
 private:
-  std::vector<WormSegment>  _segments;
+    std::vector<WormSegment> _segments;
 };
