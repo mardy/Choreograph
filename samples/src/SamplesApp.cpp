@@ -23,7 +23,7 @@ private:
   ch::Timeline            _timeline;
   int                     _scene_index = 0;
   string                  _scene_name;
-  int _controls_height = 50;
+  float _controls_height = 50;
 
 };
 
@@ -89,7 +89,7 @@ void SamplesApp::loadSample( int index )
 
   _current_scene = SampleList[_scene_index].second();
 
-  _current_scene->setSize({ width, ImGui::GetMainViewport()->Size.y - _controls_height});
+  _current_scene->setSize({ double(width), ImGui::GetMainViewport()->Size.y - _controls_height});
   _current_scene->setup();
   _current_scene->show();
 
